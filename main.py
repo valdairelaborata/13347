@@ -1,21 +1,29 @@
 class Carro:
-    def __init__(self, cor, placa, status, modelo):
-        self.cor = cor
-        self.placa = placa
-        self.status = status
+    def __init__(self, marca, modelo, ano):
+        self.marca = marca
         self.modelo = modelo
+        self.ano = ano
 
-    def ligar(self):
-        self.status = "Ligado"
+    def descricao(self):
+        return f"{self.marca} {self.modelo} {self.ano}"
 
-    def desligar(self):
-        self.status = "Desligado"
+class CarroEsportivo(Carro):
+    def __init__(self, marca, modelo, ano, velcidade_maxima):
+        super().__init__(marca, modelo, ano)
+        self.velcidade_maxima = velcidade_maxima
+
+
+    def descricao(self):
+        return super().descricao() + f" {self.velcidade_maxima}"
 
 
 
+carro = Carro("Ford", "KA", "2008")
+print(carro.descricao())
 
-meu_carro = Carro("Preta", "AKS2536", "Desligado", "Ford KA")
-meu_carro.ligar()
-meu_carro.desligar()
+esportivo = CarroEsportivo("Honda", "Civic TSI", "2008", 240)
+print(esportivo.descricao())
+
+
 
 print("Fim")
