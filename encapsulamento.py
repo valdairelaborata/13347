@@ -7,7 +7,7 @@ class Carro:
     @property
     def velocidade(self):
         return self.__velocidade
-
+    
     def __verifica_combustivel(self):
         print('Verificar nível de combustível')
 
