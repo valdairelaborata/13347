@@ -4,35 +4,40 @@ class Carro:
         self.modelo = modelo
         self.ano = ano
 
-    def descricao(self):
-        return f"{self.marca} {self.modelo} {self.ano}"
+    # def __del__(self):
+    #     print(f"Carro {self.modelo} sendo destruído")
 
-class CarroEsportivo(Carro):
-    def __init__(self, marca, modelo, ano, velcidade_maxima):
-        super().__init__(marca, modelo, ano)
-        self.velcidade_maxima = velcidade_maxima
+    def __str__(self):
+        return f"{self.marca} - {self.modelo} - {self.ano}"
 
 
-    def descricao(self):
-        return super().descricao() + f" {self.velcidade_maxima}"
+    def __repr__(self):
+        return f"Carro(marca: {self.marca}, modelo: {self.modelo})"
 
-class CarroSedan(Carro):
-    def __init__(self, marca, modelo, ano, tamanho_porta_malas):
-        super().__init__(marca, modelo, ano)
-        self.tamanho_porta_malas = tamanho_porta_malas
-
-    def descricao(self):
-        return super().descricao() + f" Porta malas {self.tamanho_porta_malas}"         
+    def __eq__(self, outro_objeto):
+        return self.marca == outro_objeto.marca and self.modelo == outro_objeto.modelo
+    
+    def __ne__(self, outro_objeto):
+        return not self.__eq__(outro_objeto)
 
 
-carro = Carro("Ford", "KA", "2008")
-print(carro.descricao())
+# del carro
 
-esportivo = CarroEsportivo("Honda", "Civic TSI", "2008", 240)
-print(esportivo.descricao())
+# print(carro)
 
-sedan = CarroSedan("Fiat", "Sienna", 2013, 450)
-print(sedan.descricao())
+# print(repr(carro))  
+  
+
+carro_01 = Carro("Ford", "KA", 2008)
+carro_02 = Carro("Honda", "Civic", 2012)
+
+
+# sao_iguais = carro_01 == carro_02
+
+sao_diferentes = carro_01 != carro_02
+
+print(sao_diferentes)
+
 
 
 
