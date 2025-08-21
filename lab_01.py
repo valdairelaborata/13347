@@ -1,7 +1,8 @@
 class ContaBancaria:
-    def __init__(self, saldo, titular):
-        self._saldo = saldo
+    def __init__(self, numero, titular, saldo):
+        self._numero = numero
         self._titular = titular
+        self._saldo = saldo
 
     @property
     def titular(self):
@@ -16,25 +17,29 @@ class ContaBancaria:
     def saldo(self):
         return self._saldo
 
-    def saque(self, valor):
+    def sacar(self, valor):
         if valor <= self._saldo:
             self._saldo -= valor
         else:
             print('Valor inválido para o saque.')
     
-    def deposito(self, valor):
+    def depositar(self, valor):
         self._saldo += valor
 
+    def __str__(self):
+        return f"Conta de {self._titular}: {self._saldo}"
 
-conta = ContaBancaria(10, "Titular")
-conta.titular = 'Titular 002'
-# print(conta.saldo)
-# conta.deposito(10)
-# print(conta.saldo)
-# conta.deposito(10)
-# print(conta.saldo)
-# conta.deposito(10)
-# print(conta.saldo)
-# conta.saque(10)
-# conta.saque(100)
-# print(conta.saldo)
+
+conta = ContaBancaria("65425", "Emerson", 500)
+print(conta)
+
+conta.depositar(10)
+print(conta)
+
+conta.sacar(10)
+print(conta)
+
+conta.depositar(10)
+print(conta)
+
+print("Fim")
