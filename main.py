@@ -1,7 +1,22 @@
 
 from fastapi import FastAPI
+import requests
 
 app = FastAPI()
+
+
+@app.get("/cep")
+def busca_cep(cep: str):
+    url_via_cep = f"https://viacep.com.br/ws/{cep}/json/"  
+    response = requests.get(url_via_cep)
+
+    if response.status_code == 200:
+        data = response.json()
+
+        return {"mensagem": f"Dados do cep: {cep} - Logradouro: {data['logradouro']} - Bairro: {data['bairro']}"}
+    else:
+        return {"mensagem": f"Erro ao consultar cep: {cep}"}
+
 
 @app.get("/usuario")
 def listar_usuarios():
