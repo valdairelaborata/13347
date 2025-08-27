@@ -1,11 +1,8 @@
 
-import requests
+from fastapi import FastAPI
 
+app = FastAPI()
 
+@app.get("/")
 def teste():
-    print("Opa!")
-
-teste()    
-
-
-
+    return {"mensagem": "Teste de resquest no método GET"}

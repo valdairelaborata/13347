@@ -1,5 +1,0 @@
-Crie um ambiente virtual chamado consulta_cep_env com venv no Python 3.x e, em seguida, crie um script para consultar um CEP usando a API abaixo. 
-https://viacep.com.br/ws/{cep}/json/
-
-
-https://realpython.com/python-requests/
