@@ -1,8 +1,17 @@
 
 from fastapi import FastAPI
+from pydantic import BaseModel
+
 import requests
 
 app = FastAPI()
+
+
+class Usuario(BaseModel):
+    nome: str
+    email: str
+    idade: int
+
 
 
 @app.get("/cep")
@@ -18,20 +27,26 @@ def busca_cep(cep: str):
         return {"mensagem": f"Erro ao consultar cep: {cep}"}
 
 
-@app.get("/usuario")
-def listar_usuarios():
-    return {"mensagem": "Dados de usuário"}
-
 @app.get("/usuario/{id}")
 def obter_usuario(id: int):
     return {"mensagem": f"Usuário {id}"}
 
-@app.get("/usuario/cpf/{cpf}")
-def obter_usuario_por_cpf(cpf: str):
-    return {"mensagem": f"Usuário localizado com o cpf: {cpf}"}
+@app.get("/usuario")
+def obter_usuario_qs(id, cpf, idade):
+    return {"mensagem": f"Usuário {id} - {cpf} - {idade}"}
 
 
-@app.get("/opa")
-def teste02():
-    return {"mensagem": "Opa!"}
+@app.post("/usuario")
+def incluir_usuario_body(usuario: Usuario):
+    return {"mensagem": f"Usuário {usuario.nome} - {usuario.email} incluído!"}
+
+
+@app.put("/usuario")
+def alterar_usuario_body(usuario: Usuario):
+    return {"mensagem": f"Usuário {usuario.nome} - {usuario.email} alterado!"}
+
+
+@app.delete("/usuario")
+def excluir_usuario_body(usuario: Usuario):
+    return {"mensagem": f"Usuário {usuario.nome} - {usuario.email} alterado!"}
 
