@@ -1,5 +1,5 @@
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 import requests
@@ -8,11 +8,10 @@ app = FastAPI()
 
 
 class Usuario(BaseModel):
+    id: int
     nome: str
     email: str
     idade: int
-
-
 
 @app.get("/cep")
 def busca_cep(cep: str):
@@ -27,18 +26,43 @@ def busca_cep(cep: str):
         return {"mensagem": f"Erro ao consultar cep: {cep}"}
 
 
+usuarios: list[Usuario] = []
+
+
+@app.post("/usuario",
+          response_model=Usuario,
+          tags=["Usuários"],
+          summary="Criar um registro de usuário",
+          description="Cria um registro de usuário caso passar pelas regras (detalhar regras)",
+          responses={500:{"description": "Erro ao criar usuario!!"}}
+          )
+def criar_usuario(usuario: Usuario):
+    try:
+
+        usuarios.append(usuario)
+
+        return usuario
+    except Exception as e:  
+        # Fazer algum log {e} 
+        raise HTTPException(status_code=500, detail=f"Erro ao criar usuario!!") 
+
+
+
 @app.get("/usuario/{id}")
 def obter_usuario(id: int):
-    return {"mensagem": f"Usuário {id}"}
+    try:
+        usuario = usuarios[0]
+        return usuario
+    except Exception as e:
+        # Fazer algum log {e} 
+        raise HTTPException(status_code=500, detail=f"Erro ao obter usuario!!") 
+    
 
 @app.get("/usuario")
 def obter_usuario_qs(id, cpf, idade):
     return {"mensagem": f"Usuário {id} - {cpf} - {idade}"}
 
 
-@app.post("/usuario")
-def incluir_usuario_body(usuario: Usuario):
-    return {"mensagem": f"Usuário {usuario.nome} - {usuario.email} incluído!"}
 
 
 @app.put("/usuario")
