@@ -25,9 +25,7 @@ def busca_cep(cep: str):
     else:
         return {"mensagem": f"Erro ao consultar cep: {cep}"}
 
-
 usuarios: list[Usuario] = []
-
 
 @app.post("/usuario",
           response_model=Usuario,
@@ -42,11 +40,10 @@ def criar_usuario(usuario: Usuario):
         usuarios.append(usuario)
 
         return usuario
+    
     except Exception as e:  
         # Fazer algum log {e} 
         raise HTTPException(status_code=500, detail=f"Erro ao criar usuario!!") 
-
-
 
 @app.get("/usuario/{id}")
 def obter_usuario(id: int):
@@ -62,13 +59,9 @@ def obter_usuario(id: int):
 def obter_usuario_qs(id, cpf, idade):
     return {"mensagem": f"Usuário {id} - {cpf} - {idade}"}
 
-
-
-
 @app.put("/usuario")
 def alterar_usuario_body(usuario: Usuario):
     return {"mensagem": f"Usuário {usuario.nome} - {usuario.email} alterado!"}
-
 
 @app.delete("/usuario")
 def excluir_usuario_body(usuario: Usuario):

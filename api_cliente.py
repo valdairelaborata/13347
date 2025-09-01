@@ -1,5 +1,5 @@
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -12,26 +12,84 @@ class Cliente(BaseModel):
 
 
 
-@app.post("/cliente")
+@app.post("/cliente",
+          response_model= Cliente,
+          tags=["Cliente"],
+          summary="Criar um registro de cliente.",
+          description="End-point para um novo registro de usuário com base nas informações inviadas.",
+          responses={500:{"description": "Erro ao criar cliente!!"}}
+          )
 def criar_cliente(cliente: Cliente):
-    return {"mensagem": f"Cliente {cliente.nome} - {cliente.email} incluído!"}
+    try:
+        return cliente    
+    except Exception as ex:
+        # Fazer algum log {e} 
+        raise HTTPException(status_code=500, detail="Erro ao criar cliente.")
 
 
-@app.get("/cliente")
+@app.get("/cliente",
+          response_model= Cliente,
+          tags=["Cliente"],
+          summary="Listar os clientes com base nos parâmetros.",
+          description="End-point para listagem de clientes.",
+          responses={500:{"description": "Erros ao listar clientes!!"}})
 def listar_cliente(nome, email):
-    return {"mensagem": f"Cliente {nome} - {email} sendo pesquisado!"}
+    try:
+        cliente = Cliente()
+        cliente.nome = nome
+        cliente.email = email
+        return cliente
+    
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail="Erro ao listar clientes.")
 
 
-@app.get("/cliente/{id}")
+@app.get("/cliente/{id}",
+          response_model= Cliente,
+          tags=["Cliente"],
+          summary="Buscar cliente com base no id passado.",
+          description="End-point para retornar os dados do cliente encontrado.",
+          responses={500:{"description": "Erro ao buscar registro de cliente."}})
 def  buscar_cliente(id: int):
-    return {"mensagem": f"Cliente {id} sendo buscado!"}
+    try:
+        cliente = Cliente()
+        cliente.nome = "nome"
+        cliente.email = "email"
+        return cliente
+    
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail="Erro ao buscar cliente.")
 
 
-@app.put("/cliente/{id}")
+
+@app.put("/cliente/{id}",
+          response_model= Cliente,
+          tags=["Cliente"],
+          summary="Alterar registro de cliente.",
+          description="End-point para alterar cliente informado.",
+          responses={500:{"description": "Erro ao alterar cliente!!"}})
 def alterar_cliente(id: int, cliente: Cliente):
-    return {"mensagem": f"Cliente {cliente.nome} - {cliente.email} sendo alterado!"}
+    try:
+        cliente = Cliente()
+        cliente.nome = "nome"
+        cliente.email = "email"
+        return cliente
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail="Erro ao alterar cliente.")
 
 
-@app.delete("/cliente/{id}")
+@app.delete("/cliente/{id}",
+          response_model= Cliente,
+          tags=["Cliente"],
+          summary="Excluir registro de cliente.",
+          description="End-point para excluir cliente informado.",
+          responses={500:{"description": "Erro ao excluir cliente!!"}})
 def excluir_cliente(id: int):
-    return {"mensagem": f"Cliente id:{id} sendo excluído!"}
+    try:
+        cliente = Cliente()
+        cliente.nome = "nome"
+        cliente.email = "email"
+        return cliente
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail="Erro ao excluir cliente.")
+
