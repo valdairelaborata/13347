@@ -1,7 +1,7 @@
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from sqlalchemy import create_engine, Column, Integer
+from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -21,6 +21,8 @@ class Usuario_data(Base):
     __tablename__ = "usuarios"
 
     id = Column(Integer, primary_key=True, index=True)
+    nome = Column(String, nullable=False )
+
 
 
 Base.metadata.create_all(engine)
@@ -29,8 +31,6 @@ Base.metadata.create_all(engine)
 class Usuario(BaseModel):
     id: int
     nome: str
-    email: str
-    idade: int
 
 @app.get("/cep")
 def busca_cep(cep: str):
@@ -56,9 +56,15 @@ usuarios: list[Usuario] = []
 def criar_usuario(usuario: Usuario):
     try:
 
-        # usuarios.append(usuario)
+        usuario_data = Usuario_data(nome = usuario.nome)
 
-        return usuario
+        db = SessionLocal()
+        db.add(usuario_data)
+        db.commit()
+        db.refresh(usuario_data)
+        db.close()
+
+        return usuario_data
     
     except Exception as e:  
         # Fazer algum log {e} 

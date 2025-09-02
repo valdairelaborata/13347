@@ -1,0 +1,13 @@
+Crie uma API para gerenciar clientes com os seguintes campos:
+
+id: Inteiro (chave primária, auto incremento)
+
+nome: String
+
+email: String
+
+telefone: String
+
+idade: Inteiro
+
+cidade: String
