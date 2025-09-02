@@ -1,10 +1,29 @@
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from sqlalchemy import create_engine, Column, Integer
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 import requests
 
 app = FastAPI()
+
+
+SQLALCHEMY_DATABASE_URL = "sqlite:///./usuarios.db"
+
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+
+SessionLocal = sessionmaker(autoflush=False, bind=engine)
+Base = declarative_base()
+
+class Usuario_data(Base):
+    __tablename__ = "usuarios"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+
+Base.metadata.create_all(engine)
 
 
 class Usuario(BaseModel):
@@ -37,7 +56,7 @@ usuarios: list[Usuario] = []
 def criar_usuario(usuario: Usuario):
     try:
 
-        usuarios.append(usuario)
+        # usuarios.append(usuario)
 
         return usuario
     
