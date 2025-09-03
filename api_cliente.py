@@ -87,13 +87,17 @@ def listar_cliente(nome, email):
           responses={500:{"description": "Erro ao buscar registro de cliente."}})
 def  buscar_cliente(id: int):
     try:
-        cliente = Cliente()
-        cliente.nome = "nome"
-        cliente.email = "email"
+        db =  SessionLocal()        
+        cliente = db.query(Cliente_Data).filter(Cliente_Data.id == id).first()
+        db.close()
+
+        if not cliente:
+          raise HTTPException(status_code=404, detail=f"Não existe cliente com o id informado!")
+
         return cliente
     
     except Exception as ex:
-        raise HTTPException(status_code=500, detail="Erro ao buscar cliente.")
+        raise HTTPException(status_code=500, detail=f"Erro ao buscar cliente {ex}.")
 
 
 

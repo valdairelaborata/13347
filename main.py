@@ -106,10 +106,11 @@ def obter_usuario(id: int):
 
         db = SessionLocal()
         usuario = db.query(Usuario_data).filter(Usuario_data.id == id).first()
+        db.close()
         return usuario
     except Exception as e:
         # Fazer algum log {e} 
-        raise HTTPException(status_code=500, detail=f"Erro ao obter usuario!!") 
+        raise HTTPException(status_code=500, detail=f"Erro ao obter usuario{e}!!") 
     
 
 # @app.get("/usuario")
