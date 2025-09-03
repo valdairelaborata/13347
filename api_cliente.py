@@ -1,14 +1,40 @@
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from sqlalchemy import Column, Integer, String, create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 app = FastAPI()
+
+data_base = "sqlite:///./clientes.db"
+engine = create_engine(data_base)
+SessionLocal = sessionmaker(autoflush=False, bind=engine)
+Base = declarative_base()
+
+
+class Cliente_Data(Base):
+    __tablename__="clientes"
+    id = Column(Integer, primary_key=True, index=True)
+    nome = Column(String)
+    email = Column(String)
+    telefone = Column(String)
+    idade = Column(Integer)
+    cidade = Column(String)
+
+
+
+Base.metadata.create_all(engine)
 
 
 class Cliente(BaseModel):
     id: int 
     nome: str
     email : str
+    telefone : str
+    idade : int
+    cidade : str
+
 
 
 
@@ -21,10 +47,19 @@ class Cliente(BaseModel):
           )
 def criar_cliente(cliente: Cliente):
     try:
-        return cliente    
+        conn = SessionLocal()
+
+        cliente_data = Cliente_Data(nome = cliente.nome, email = cliente.email, telefone = cliente.telefone, idade = cliente.idade, cidade = cliente.cidade)
+        conn.add(cliente_data)
+        conn.commit()
+        conn.refresh(cliente_data)
+        conn.close()
+
+        return cliente_data
+        
     except Exception as ex:
         # Fazer algum log {e} 
-        raise HTTPException(status_code=500, detail="Erro ao criar cliente.")
+        raise HTTPException(status_code=500, detail=f"Erro ao criar cliente {ex}.")
 
 
 @app.get("/cliente",
