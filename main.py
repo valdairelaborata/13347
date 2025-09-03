@@ -44,7 +44,6 @@ def busca_cep(cep: str):
     else:
         return {"mensagem": f"Erro ao consultar cep: {cep}"}
 
-usuarios: list[Usuario] = []
 
 @app.post("/usuario",
           response_model=Usuario,
@@ -70,19 +69,52 @@ def criar_usuario(usuario: Usuario):
         # Fazer algum log {e} 
         raise HTTPException(status_code=500, detail=f"Erro ao criar usuario!!") 
 
-@app.get("/usuario/{id}")
+
+@app.get("/usuario",
+          response_model=Usuario,
+          tags=["Usuários"],
+          summary="Listar usuários",
+          description="Listagem de usuários",
+          responses={500:{"description": "Erro ao listar usuarios!!"}}
+          )
+def listar_usuario():
+    try:
+        db = SessionLocal()
+        usuarios = db.query(Usuario_data).all()
+ 
+
+        db.close()
+
+        return usuarios
+        
+    except Exception as e:  
+        # Fazer algum log {e} 
+        raise HTTPException(status_code=500, detail=f"Erro ao listar usuarios: {e}!!") 
+
+
+
+
+@app.get("/usuario/{id}",
+          response_model=Usuario,
+          tags=["Usuários"],
+          summary="Obter usuário",
+          description="Busacar um usuário",
+          responses={500:{"description": "Erro ao buscar usuario!!"}}
+          )
 def obter_usuario(id: int):
     try:
-        usuario = usuarios[0]
+
+        db = SessionLocal()
+        usuario = db.query(Usuario_data).filter(Usuario_data.id == id).first()
         return usuario
     except Exception as e:
         # Fazer algum log {e} 
         raise HTTPException(status_code=500, detail=f"Erro ao obter usuario!!") 
     
 
-@app.get("/usuario")
-def obter_usuario_qs(id, cpf, idade):
-    return {"mensagem": f"Usuário {id} - {cpf} - {idade}"}
+# @app.get("/usuario")
+# def obter_usuario_qs(id, cpf, idade):
+#     return {"mensagem": f"Usuário {id} - {cpf} - {idade}"}
 
 @app.put("/usuario")
 def alterar_usuario_body(usuario: Usuario):
