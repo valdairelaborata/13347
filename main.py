@@ -106,7 +106,14 @@ def obter_usuario(id: int):
 
         db = SessionLocal()
         usuario = db.query(Usuario_data).filter(Usuario_data.id == id).first()
+
         db.close()
+
+
+        if not usuario:
+           raise HTTPException(status_code=404, detail=f"Usuário não encontrado!!") 
+   
+
         return usuario
     except Exception as e:
         # Fazer algum log {e} 
@@ -143,7 +150,30 @@ def alterar_usuario(id: int, usuario: Usuario):
         raise HTTPException(status_code=500, detail=f"Erro ao alterar usuario{e}!!") 
     
 
-@app.delete("/usuario")
-def excluir_usuario_body(usuario: Usuario):
-    return {"mensagem": f"Usuário {usuario.nome} - {usuario.email} alterado!"}
+@app.delete("/usuario/{id}",          
+          tags=["Usuários"],
+          summary="Excluir usuário",
+          description="Excluir um registro de usuário",
+          responses={500:{"description": "Erro ao excluir usuario!!"}}
+          )
+def excluir_usuario_body(id: int):
+    try:
+        db = SessionLocal()
+        usuario_data = db.query(Usuario_data).filter(Usuario_data.id == id).first()
+
+        if not usuario_data:
+           raise HTTPException(status_code=404, detail=f"Usuário não encontrado!!") 
+     
+        db.delete(usuario_data)
+        db.commit()
+        db.close()
+
+        return {"Mensagem": "Usuário excluido com sucesso"}
+
+    except Exception as e:
+        # Fazer algum log {e} 
+        raise HTTPException(status_code=500, detail=f"Erro ao excluir usuario{e}!!") 
+    
+
+    
 
