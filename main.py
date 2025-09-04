@@ -112,14 +112,36 @@ def obter_usuario(id: int):
         # Fazer algum log {e} 
         raise HTTPException(status_code=500, detail=f"Erro ao obter usuario{e}!!") 
     
+@app.put("/usuario/{id}",
+          response_model=Usuario,
+          tags=["Usuários"],
+          summary="Alterar usuário",
+          description="Altero um registro de usuário",
+          responses={500:{"description": "Erro ao alterar usuario!!"}}
+         )
+def alterar_usuario(id: int, usuario: Usuario):
+    try:
+        db = SessionLocal()
 
-# @app.get("/usuario")
-# def obter_usuario_qs(id, cpf, idade):
-#     return {"mensagem": f"Usuário {id} - {cpf} - {idade}"}
+        usuario_data = db.query(Usuario_data).filter(Usuario_data.id == id).first()
 
-@app.put("/usuario")
-def alterar_usuario_body(usuario: Usuario):
-    return {"mensagem": f"Usuário {usuario.nome} - {usuario.email} alterado!"}
+        if not usuario_data:
+            raise HTTPException(status_code=404, detail=f"Usuário não encontrado!!") 
+
+
+        usuario_data.nome = usuario.nome
+
+        db.commit()
+        db.refresh(usuario_data)
+
+        db.close()
+
+        return usuario_data
+
+    except Exception as e:
+        # Fazer algum log {e} 
+        raise HTTPException(status_code=500, detail=f"Erro ao alterar usuario{e}!!") 
+    
 
 @app.delete("/usuario")
 def excluir_usuario_body(usuario: Usuario):
