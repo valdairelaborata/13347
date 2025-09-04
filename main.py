@@ -27,7 +27,6 @@ class Usuario_data(Base):
 
 Base.metadata.create_all(engine)
 
-
 class Usuario(BaseModel):
     id: int
     nome: str
@@ -150,7 +149,7 @@ def alterar_usuario(id: int, usuario: Usuario):
         raise HTTPException(status_code=500, detail=f"Erro ao alterar usuario{e}!!") 
     
 
-@app.delete("/usuario/{id}",          
+@app.delete("/usuario/{id}",            
           tags=["Usuários"],
           summary="Excluir usuário",
           description="Excluir um registro de usuário",
