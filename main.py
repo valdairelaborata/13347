@@ -1,5 +1,5 @@
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import sessionmaker
@@ -31,6 +31,14 @@ class Usuario(BaseModel):
     id: int
     nome: str
 
+
+def get_db():
+     db = SessionLocal()
+     try:
+         yield db
+     finally:
+         db.close()
+
 @app.get("/cep")
 def busca_cep(cep: str):
     url_via_cep = f"https://viacep.com.br/ws/{cep}/json/"  
@@ -43,7 +51,6 @@ def busca_cep(cep: str):
     else:
         return {"mensagem": f"Erro ao consultar cep: {cep}"}
 
-
 @app.post("/usuario",
           response_model=Usuario,
           tags=["Usuários"],
@@ -51,16 +58,15 @@ def busca_cep(cep: str):
           description="Cria um registro de usuário caso passar pelas regras (detalhar regras)",
           responses={500:{"description": "Erro ao criar usuario!!"}}
           )
-def criar_usuario(usuario: Usuario):
+def criar_usuario(usuario: Usuario, db = Depends(get_db)):
     try:
-
+        
         usuario_data = Usuario_data(nome = usuario.nome)
 
-        db = SessionLocal()
         db.add(usuario_data)
         db.commit()
         db.refresh(usuario_data)
-        db.close()
+        
 
         return usuario_data
     
@@ -68,30 +74,22 @@ def criar_usuario(usuario: Usuario):
         # Fazer algum log {e} 
         raise HTTPException(status_code=500, detail=f"Erro ao criar usuario!!") 
 
-
 @app.get("/usuario",
-          response_model=Usuario,
+          response_model=list[Usuario],
           tags=["Usuários"],
           summary="Listar usuários",
           description="Listagem de usuários",
           responses={500:{"description": "Erro ao listar usuarios!!"}}
           )
-def listar_usuario():
+def listar_usuario(db = Depends(get_db)):
     try:
-        db = SessionLocal()
+      
         usuarios = db.query(Usuario_data).all()
- 
-
-        db.close()
-
         return usuarios
         
     except Exception as e:  
         # Fazer algum log {e} 
         raise HTTPException(status_code=500, detail=f"Erro ao listar usuarios: {e}!!") 
-
-
-
 
 @app.get("/usuario/{id}",
           response_model=Usuario,
@@ -100,14 +98,16 @@ def listar_usuario():
           description="Busacar um usuário",
           responses={500:{"description": "Erro ao buscar usuario!!"}}
           )
-def obter_usuario(id: int):
+def obter_usuario(id: int, db = Depends(get_db) ):
     try:
 
-        db = SessionLocal()
+        # db = SessionLocal()
+        # usuario = db.query(Usuario_data).filter(Usuario_data.id == id).first()
+
+        # db.close()
+
+
         usuario = db.query(Usuario_data).filter(Usuario_data.id == id).first()
-
-        db.close()
-
 
         if not usuario:
            raise HTTPException(status_code=404, detail=f"Usuário não encontrado!!") 
@@ -117,7 +117,21 @@ def obter_usuario(id: int):
     except Exception as e:
         # Fazer algum log {e} 
         raise HTTPException(status_code=500, detail=f"Erro ao obter usuario{e}!!") 
-    
+
+@app.get("/usuario/buscar",
+          response_model=list[Usuario],
+          tags=["Usuários"],
+          summary="Obter usuário por parte do nome",
+          description="Busacar um usuário",
+          responses={500:{"description": "Erro ao buscar usuario!!"}}
+          )
+def obter_usuario_por_nome(nome: str, db = Depends(get_db) ):
+    try:
+        usuarios = db.query(Usuario_data).filter(Usuario_data.nome.ilike(f"%{nome}%")).all()
+    except Exception as e:
+        # Fazer algum log {e} 
+        raise HTTPException(status_code=500, detail=f"Erro ao alterar usuario{e}!!") 
+
 @app.put("/usuario/{id}",
           response_model=Usuario,
           tags=["Usuários"],
@@ -125,10 +139,9 @@ def obter_usuario(id: int):
           description="Altero um registro de usuário",
           responses={500:{"description": "Erro ao alterar usuario!!"}}
          )
-def alterar_usuario(id: int, usuario: Usuario):
+def alterar_usuario(id: int, usuario: Usuario, db = Depends(get_db)):
     try:
-        db = SessionLocal()
-
+     
         usuario_data = db.query(Usuario_data).filter(Usuario_data.id == id).first()
 
         if not usuario_data:
@@ -140,14 +153,12 @@ def alterar_usuario(id: int, usuario: Usuario):
         db.commit()
         db.refresh(usuario_data)
 
-        db.close()
-
+     
         return usuario_data
 
     except Exception as e:
         # Fazer algum log {e} 
         raise HTTPException(status_code=500, detail=f"Erro ao alterar usuario{e}!!") 
-    
 
 @app.delete("/usuario/{id}",            
           tags=["Usuários"],
@@ -155,9 +166,9 @@ def alterar_usuario(id: int, usuario: Usuario):
           description="Excluir um registro de usuário",
           responses={500:{"description": "Erro ao excluir usuario!!"}}
           )
-def excluir_usuario_body(id: int):
+def excluir_usuario_body(id: int, db = Depends(get_db)):
     try:
-        db = SessionLocal()
+        
         usuario_data = db.query(Usuario_data).filter(Usuario_data.id == id).first()
 
         if not usuario_data:
@@ -165,7 +176,7 @@ def excluir_usuario_body(id: int):
      
         db.delete(usuario_data)
         db.commit()
-        db.close()
+   
 
         return {"Mensagem": "Usuário excluido com sucesso"}
 
