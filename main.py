@@ -5,7 +5,6 @@ from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-import requests
 
 app = FastAPI()
 
@@ -30,6 +29,7 @@ Base.metadata.create_all(engine)
 class Usuario(BaseModel):
     id: int
     nome: str
+
 
 
 def get_db():
@@ -91,6 +91,24 @@ def listar_usuario(db = Depends(get_db)):
         # Fazer algum log {e} 
         raise HTTPException(status_code=500, detail=f"Erro ao listar usuarios: {e}!!") 
 
+
+
+@app.get("/usuario/buscar",
+          response_model=list[Usuario],
+          tags=["Usuários"],
+          summary="Obter usuário por parte do nome",
+          description="Busacar um usuário",
+          responses={500:{"description": "Erro ao buscar usuario!!"}}
+          )
+def obter_usuario_por_nome(nome: str, db = Depends(get_db) ):
+    try:
+        usuarios = db.query(Usuario_data).filter(Usuario_data.nome.ilike(f"%{nome}%")).all()      
+        return usuarios 
+        
+    except Exception as e:
+        # Fazer algum log {e} 
+        raise HTTPException(status_code=500, detail=f"Erro ao alterar usuario{e}!!") 
+
 @app.get("/usuario/{id}",
           response_model=Usuario,
           tags=["Usuários"],
@@ -118,19 +136,6 @@ def obter_usuario(id: int, db = Depends(get_db) ):
         # Fazer algum log {e} 
         raise HTTPException(status_code=500, detail=f"Erro ao obter usuario{e}!!") 
 
-@app.get("/usuario/buscar",
-          response_model=list[Usuario],
-          tags=["Usuários"],
-          summary="Obter usuário por parte do nome",
-          description="Busacar um usuário",
-          responses={500:{"description": "Erro ao buscar usuario!!"}}
-          )
-def obter_usuario_por_nome(nome: str, db = Depends(get_db) ):
-    try:
-        usuarios = db.query(Usuario_data).filter(Usuario_data.nome.ilike(f"%{nome}%")).all()
-    except Exception as e:
-        # Fazer algum log {e} 
-        raise HTTPException(status_code=500, detail=f"Erro ao alterar usuario{e}!!") 
 
 @app.put("/usuario/{id}",
           response_model=Usuario,
