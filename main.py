@@ -1,8 +1,8 @@
 
 from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
-from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
+from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 
 
@@ -21,14 +21,32 @@ class Usuario_data(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     nome = Column(String, nullable=False )
+    status_id = Column(Integer, ForeignKey("status.id"), nullable=False)
+
+    status = relationship("Status_data")
+
+
+
+
+class Status_data(Base):
+    __tablename__ = "status"
+
+    id = Column(Integer, primary_key=True, index=True)
+    descricao = Column(String, nullable=False )
 
 
 
 Base.metadata.create_all(engine)
 
+class Status(BaseModel):
+        id: int
+        descricao: str
+
+
 class Usuario(BaseModel):
     id: int
     nome: str
+    status: Status
 
 
 
@@ -61,7 +79,7 @@ def busca_cep(cep: str):
 def criar_usuario(usuario: Usuario, db = Depends(get_db)):
     try:
         
-        usuario_data = Usuario_data(nome = usuario.nome)
+        usuario_data = Usuario_data(nome = usuario.nome, status_id = usuario.status.id)
 
         db.add(usuario_data)
         db.commit()
@@ -72,7 +90,7 @@ def criar_usuario(usuario: Usuario, db = Depends(get_db)):
     
     except Exception as e:  
         # Fazer algum log {e} 
-        raise HTTPException(status_code=500, detail=f"Erro ao criar usuario!!") 
+        raise HTTPException(status_code=500, detail=f"Erro ao criar usuario!! {e}") 
 
 # @app.get("/usuario",
 #           response_model=list[Usuario],
@@ -154,6 +172,7 @@ def alterar_usuario(id: int, usuario: Usuario, db = Depends(get_db)):
 
 
         usuario_data.nome = usuario.nome
+        usuario_data.status_id = usuario.status.id
 
         db.commit()
         db.refresh(usuario_data)
@@ -190,5 +209,28 @@ def excluir_usuario_body(id: int, db = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Erro ao excluir usuario{e}!!") 
     
 
+
+@app.post("/status",     
+          tags=["Status"],
+          summary="Criar status",
+          description="Cria status de usuário caso passar pelas regras (detalhar regras)",
+          responses={500:{"description": "Erro ao criar status!!"}}
+          )
+def criar_status(db = Depends(get_db)):
+    try:
+        
+        status_padrao = ["Ativo", "Inativo"]
+
+        for descricao in status_padrao:
+            db.add(Status_data(descricao = descricao))
+
+        db.commit()
+
+
+        return {"Mensagem": "Status criado!" }
+    
+    except Exception as e:  
+        # Fazer algum log {e} 
+        raise HTTPException(status_code=500, detail=f"Erro ao criar status!!") 
     
 
