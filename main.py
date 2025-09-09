@@ -74,22 +74,22 @@ def criar_usuario(usuario: Usuario, db = Depends(get_db)):
         # Fazer algum log {e} 
         raise HTTPException(status_code=500, detail=f"Erro ao criar usuario!!") 
 
-@app.get("/usuario",
-          response_model=list[Usuario],
-          tags=["Usuários"],
-          summary="Listar usuários",
-          description="Listagem de usuários",
-          responses={500:{"description": "Erro ao listar usuarios!!"}}
-          )
-def listar_usuario(db = Depends(get_db)):
-    try:
+# @app.get("/usuario",
+#           response_model=list[Usuario],
+#           tags=["Usuários"],
+#           summary="Listar usuários",
+#           description="Listagem de usuários",
+#           responses={500:{"description": "Erro ao listar usuarios!!"}}
+#           )
+# def listar_usuario(db = Depends(get_db)):
+#     try:
       
-        usuarios = db.query(Usuario_data).all()
-        return usuarios
+#         usuarios = db.query(Usuario_data).all()
+#         return usuarios
         
-    except Exception as e:  
-        # Fazer algum log {e} 
-        raise HTTPException(status_code=500, detail=f"Erro ao listar usuarios: {e}!!") 
+#     except Exception as e:  
+#         # Fazer algum log {e} 
+#         raise HTTPException(status_code=500, detail=f"Erro ao listar usuarios: {e}!!") 
 
 
 
