@@ -9,7 +9,8 @@ from schemas import Usuario
 
 def criar_usuario(usuario: Usuario, db: Session):
         
-    usuario_data = Usuario_data(nome = usuario.nome, status_id = usuario.status.id)
+    usuario_data = Usuario_data(nome = usuario.nome,
+                                 status_id = usuario.status.id)
 
     db.add(usuario_data)
     db.commit()
@@ -41,14 +42,14 @@ def alterar_usuario(id: int, usuario: Usuario, db: Session):
         raise HTTPException(status_code=404, detail=f"Usuário não encontrado!!") 
 
 
-        usuario_data.nome = usuario.nome
-        usuario_data.status_id = usuario.status.id
+    usuario_data.nome = usuario.nome
+    usuario_data.status_id = usuario.status.id
 
-        db.commit()
-        db.refresh(usuario_data)
+    db.commit()
+    db.refresh(usuario_data)
 
-     
-        return usuario_data
+    
+    return usuario_data
 
 
 
