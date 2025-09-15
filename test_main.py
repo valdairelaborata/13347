@@ -35,40 +35,22 @@ app.dependency_overrides[database.get_db] = override_get_db
 
 client = TestClient(app)
 
-def test_criar_usuario():
+def test_criar_usuario_status_code():
     payload = {
         "id": 0,
         "nome": "João",
-        "status": {
-            "id": 1,
-            "descricao": "string"
-
-        }
+        "status_id": 1
     }
     response = client.post("/usuario/", json=payload)
-    print(response.json())  
-    assert response.status_code == 200
-    # data = response.json()
-    # assert data["nome"] == "João"
-    # assert data["status"]["descricao"] == "Ativo"
-    # assert "id" in data
-    # assert "id" in data["status"]
+    response_json = response.json()
 
-
-def test_obter_usuario():
-    payload = {
-        "id": 0,
-        "nome": "João",
-        "status": {
-            "id": 1,
-            "descricao": "string"
-        }
-    }
-    client.post("/usuario/", json=payload)
-
+    # try:
+    #     response_json = response.json()
+    # except Exception as e:
+    #     response_json = None
+    #     print("Erro ao decodificar JSON:", e)
     
-    # response = client.get("/usuario/2")  
-    # assert response.status_code == 200
-    # data = response.json()
-    # assert data["nome"] == "Maria"
-    # assert data["status"]["descricao"] == "Inativo"
+    if response_json:
+        assert response_json.get("nome") == "João"
+    
+    assert response.status_code == 200

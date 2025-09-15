@@ -10,7 +10,7 @@ from schemas import Usuario
 def criar_usuario(usuario: Usuario, db: Session):
         
     usuario_data = Usuario_data(nome = usuario.nome,
-                                 status_id = usuario.status.id)
+                                 status_id = usuario.status_id)
 
     db.add(usuario_data)
     db.commit()
