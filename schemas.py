@@ -9,4 +9,4 @@ class Status(BaseModel):
 class Usuario(BaseModel):
     id: int
     nome: str
-    status: Status
+    status_id: int
