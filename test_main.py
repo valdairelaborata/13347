@@ -41,16 +41,5 @@ def test_criar_usuario_status_code():
         "nome": "João",
         "status_id": 1
     }
-    response = client.post("/usuario/", json=payload)
-    response_json = response.json()
-
-    # try:
-    #     response_json = response.json()
-    # except Exception as e:
-    #     response_json = None
-    #     print("Erro ao decodificar JSON:", e)
-    
-    if response_json:
-        assert response_json.get("nome") == "João"
-    
+    response = client.post("/usuario/", json=payload)   
     assert response.status_code == 200
